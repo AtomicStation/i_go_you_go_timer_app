@@ -26,7 +26,7 @@ class WorkoutTimeApp(App):
         self.start_button = Button(text="Start", on_press=self.start_workout)
         self.layout.add_widget(self.start_button)
 
-        self.timer_label = Label(text="Get ready", font_size='40sp')
+        self.timer_label = Label(text="Ready", font_size='40sp')
         self.layout.add_widget(self.timer_label)
 
         self.done_button = Button(text="Done", on_press=self.done_round)
@@ -52,6 +52,8 @@ class WorkoutTimeApp(App):
     def reset(self, instance):
         self.start_button.disabled = False
         self.done_button.disabled = True
+        self.running = False
+        self.timer_label.text = "Ready"
 
     def update_timer(self, dt):
         if not self.running:
@@ -59,15 +61,15 @@ class WorkoutTimeApp(App):
         
         if self.is_ready:
             if self.ready_time > 0:
-                self.timer_label.text = f"Get Ready: {self.ready_time}"
+                self.timer_label.text = f"Starting in: {self.ready_time}"
                 self.ready_time -= 1
             else:
                 self.is_ready = False
-                self.timer_label.text = f"Round {self.current_round + 1}: {self.timer}"
+                self.timer_label.text = f"I GO - Round {self.current_round + 1}: {self.timer}"
         else:
             if self.is_counting_down:
                 if self.timer > 0:
-                    self.timer_label.text = f"Round {self.current_round + 1}: {self.timer}"
+                    self.timer_label.text = f"YOU GO (rest) - Round {self.current_round + 1}: {self.timer}"
                     self.timer -= 1
                 else:
                     self.is_counting_down = False
@@ -76,13 +78,14 @@ class WorkoutTimeApp(App):
                         self.timer_label.text = "Workout Complete!"
                         self.running = False
                         self.done_button.disabled = True
+                        self.start_button.disabled = False
                         Clock.unschedule(self.update_timer)
                     else:
                         self.ready_time = 10
                         self.is_ready = True
             else:
                 self.timer += 1
-                self.timer_label.text = f"Round {self.current_round + 1}: {self.timer}"
+                self.timer_label.text = f"I GO - Round {self.current_round + 1}: {self.timer}"
 
     def done_round(self, instance):
         self.is_counting_down = True
